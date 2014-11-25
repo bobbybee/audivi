@@ -1,7 +1,12 @@
 <script>
 
+function AmplitudeFX() {
+	
+}
+
 function Transform() {
-	this.amplitude = 1;
+	this.rawAmplitude = 1;
+	this.amplitudeFX = [];
 }
 
 Transform.prototype.get = function() {
@@ -55,7 +60,7 @@ var ctx = new AudioContext();
 var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
 
 var transform = new Transform();
-transform.amplitude = 0.1;
+transform.rawAmplitude = 0.1;
 
 generateSawtoothWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate, transform);
 
