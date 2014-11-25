@@ -85,8 +85,8 @@ function generateSawtoothWave(audivi, buffer, frequency, time, transform) {
 	return buffer;
 }
 
-function Audivi() {
-	this.audioContext = new AudioContext();
+function Audivi(audioContext) {
+	this.audioContext = audioContext ? audioContext : new AudioContext();
 	this.sequences = [];
 }
 
@@ -115,17 +115,12 @@ Audivi.prototype.play = function(time, buffer) {
 }
 
 function audite(sound) { // plural imperative of audio, audire, literally Latin for "Hear Ye"
-	var instance = new Audivi();
+	var instance = new Audivi(this.audioContext);
 	sound(instance);
 	instance.playSequence();
 }
 
-audite(function(audivi) {
-	var transform = new Transform();
-	transform.rawAmplitude = 0.1;
-	transform.addEffect(new ChoppyFX(20));
-
-	audivi.sequence(0, generateSawtoothWave(audivi, audivi.createBuffer(), 440, 5, transform));
-});
+var audioContext = new AudioContext();
+audite.prototype.audioContext = audioContext;
 
 </script>
