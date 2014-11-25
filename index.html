@@ -17,14 +17,17 @@ function generateSineWave(buffer, frequency, time, samplesPerSecond) {
 	}
 }
 
+function play(ctx, time, buffer) {
+	var source = ctx.createBufferSource();
+	source.buffer = buffer;
+	source.connect(ctx.destination);
+	source.start(time);
+}
+
 var ctx = new AudioContext();
 
 var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
 generateSineWave(buffer.getChannelData(0), 440, 3, ctx.sampleRate);
 
-var source = ctx.createBufferSource();
-source.buffer = buffer;
-source.connect(ctx.destination);
-source.start(0);
-
+play(ctx, 0, buffer);
 </script>
