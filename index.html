@@ -1,7 +1,13 @@
 <script>
 
-function AmplitudeFX() {
+function ChoppyFX(numberOfSpaces) {
+	this.smoothness = numberOfSpaces;
+}
 
+ChoppyFX.prototype.get = function(audivi, sampleNum) {
+	var samplesPerSecond = audivi.audioContext.sampleRate;
+
+	return (sampleNum % (samplesPerSecond / this.smoothness)) > (samplesPerSecond / (this.smoothness * 2)) ? 1 : 0;
 }
 
 function Transform() {
@@ -10,7 +16,13 @@ function Transform() {
 }
 
 Transform.prototype.get = function(audivi, sampleNum) {
-	return this.rawAmplitude;
+	var amplitude = this.rawAmplitude;
+
+	for(var i = 0; i < this.amplitudeFX.length; ++i) {
+		amplitude *= this.amplitudeFX[i].get(audivi, sampleNum);
+	}
+
+	return amplitude;
 }
 
 function generateSquareWave(audivi, buffer, frequency, time, transform) {
@@ -87,6 +99,9 @@ var audivi = new Audivi();
 
 var transform = new Transform();
 transform.rawAmplitude = 0.1;
+
+var choppyEffect = new ChoppyFX(20);
+transform.amplitudeFX.push(choppyEffect);
 
 audivi.play(0, generateSawtoothWave(audivi, audivi.createBuffer(), 440, 5, transform));
 
