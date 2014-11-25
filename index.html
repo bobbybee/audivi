@@ -124,3 +124,18 @@ var audioContext = new AudioContext();
 audite.prototype.audioContext = audioContext;
 
 </script>
+
+<script>
+// neat little sound effect to demonstrate some of the features of Audite
+
+audite(
+	function(audivi) {
+		var transform = new Transform();
+		transform.addEffect(new ChoppyFX(1));
+		transform.addEffect(new ChoppyFX(6));
+		audivi.sequence(0, generateSineWave(audivi, audivi.createBuffer(), 750, 1, transform)); 
+	}
+);
+
+
+</script>
