@@ -26,6 +26,15 @@ function generateTriangleWave(buffer, frequency, time, samplesPerSecond) {
 	}
 }
 
+function generateSawtoothWave(buffer, frequency, time, samplesPerSecond) {
+	var samples = time * samplesPerSecond;
+	var wavelength = (samplesPerSecond / frequency);
+
+	for(var i = 0; i < samples; ++i) {
+		buffer[i] = -1 + 2 * ( (i % wavelength) / wavelength);
+	}
+}
+
 function play(ctx, time, buffer) {
 	var source = ctx.createBufferSource();
 	source.buffer = buffer;
@@ -36,6 +45,6 @@ function play(ctx, time, buffer) {
 var ctx = new AudioContext();
 
 var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-generateTriangleWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate);
+generateSawtoothWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate);
 play(ctx, 0, buffer);
 </script>
