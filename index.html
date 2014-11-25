@@ -114,14 +114,18 @@ Audivi.prototype.play = function(time, buffer) {
 	source.start(time);
 }
 
-var audivi = new Audivi();
+function audite(sound) { // plural imperative of audio, audire, literally Latin for "Hear Ye"
+	var instance = new Audivi();
+	sound(instance);
+	instance.playSequence();
+}
 
-var transform = new Transform();
-transform.rawAmplitude = 0.1;
-transform.addEffect(new ChoppyFX(20));
+audite(function(audivi) {
+	var transform = new Transform();
+	transform.rawAmplitude = 0.1;
+	transform.addEffect(new ChoppyFX(20));
 
-audivi.sequence(0, generateSawtoothWave(audivi, audivi.createBuffer(), 440, 5, transform));
-
-audivi.playSequence();
+	audivi.sequence(0, generateSawtoothWave(audivi, audivi.createBuffer(), 440, 5, transform));
+});
 
 </script>
