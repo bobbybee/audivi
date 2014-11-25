@@ -87,10 +87,24 @@ function generateSawtoothWave(audivi, buffer, frequency, time, transform) {
 
 function Audivi() {
 	this.audioContext = new AudioContext();
+	this.sequences = [];
 }
 
 Audivi.prototype.createBuffer = function() {
 	return this.audioContext.createBuffer(1, this.audioContext.sampleRate, this.audioContext.sampleRate);
+}
+
+Audivi.prototype.sequence = function(time, buffer) {
+	this.sequences.push({
+		time: time,
+		buffer: buffer
+	});
+}
+
+Audivi.prototype.playSequence = function() {
+	for(var i = 0; i < this.sequences.length; ++i) {
+		this.play(this.sequences[i].time, this.sequences[i].buffer);
+	}
 }
 
 Audivi.prototype.play = function(time, buffer) {
@@ -106,6 +120,8 @@ var transform = new Transform();
 transform.rawAmplitude = 0.1;
 transform.addEffect(new ChoppyFX(20));
 
-audivi.play(0, generateSawtoothWave(audivi, audivi.createBuffer(), 440, 5, transform));
+audivi.sequence(0, generateSawtoothWave(audivi, audivi.createBuffer(), 440, 5, transform));
+
+audivi.playSequence();
 
 </script>
