@@ -27,7 +27,10 @@ function play(ctx, time, buffer) {
 var ctx = new AudioContext();
 
 var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-generateSineWave(buffer.getChannelData(0), 440, 3, ctx.sampleRate);
+generateSineWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate);
+play(ctx, 0, buffer);
 
+var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+generateSquareWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate);
 play(ctx, 0, buffer);
 </script>
