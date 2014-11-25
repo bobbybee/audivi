@@ -9,7 +9,7 @@ function Transform() {
 	this.amplitudeFX = [];
 }
 
-Transform.prototype.get = function() {
+Transform.prototype.get = function(audivi, sampleNum) {
 	return this.rawAmplitude;
 }
 
@@ -21,7 +21,7 @@ function generateSquareWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = ((i % wavelength) > (wavelength / 2) ? 0 : 1) * transform.get();
+		access[i] = ((i % wavelength) > (wavelength / 2) ? 0 : 1) * transform.get(audivi, i);
 	}
 
 	return buffer;
@@ -34,7 +34,7 @@ function generateSineWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency))) * transform.get();
+		access[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency))) * transform.get(audivi, i);
 	}
 
 	return buffer;
@@ -48,7 +48,7 @@ function generateTriangleWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = ((i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2)) * transform.get();
+		access[i] = ((i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2)) * transform.get(audivi, i);
 	}
 	
 	return buffer;
@@ -62,7 +62,7 @@ function generateSawtoothWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = (-1 + 2 * ( (i % wavelength) / wavelength)) * transform.get();
+		access[i] = (-1 + 2 * ( (i % wavelength) / wavelength)) * transform.get(audivi, i);
 	}
 
 	return buffer;
