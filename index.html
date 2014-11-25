@@ -18,6 +18,14 @@ FadeInFX.prototype.get = function(audivi, transform, sampleNum) {
 	return sampleNum / (transform.duration * audivi.audioContext.sampleRate);
 }
 
+function FadeOutFX() {
+
+}
+
+FadeOutFX.prototype.get = function(audivi, transform, sampleNum) {
+	return 1 - (sampleNum / (transform.duration * audivi.audioContext.sampleRate));
+}
+
 function Transform() {
 	this.rawAmplitude = 1;
 	this.amplitudeFX = [];
@@ -140,11 +148,19 @@ audite.prototype.audioContext = audioContext;
 audite(
 	function(audivi) {
 		var transform = new Transform();
+
 		transform.duration = 1;
-		//transform.addAmplitudeEffect(new ChoppyFX(1));
-		//transform.addAmplitudeEffect(new ChoppyFX(6));
+		transform.addAmplitudeEffect(new ChoppyFX(3));
 		transform.addAmplitudeEffect(new FadeInFX());
+
 		audivi.sequence(0, generateSineWave(audivi, audivi.createBuffer(), 750, 1, transform)); 
+
+		transform.amplitudeFX = [];
+		transform.addAmplitudeEffect(new ChoppyFX(10));
+		transform.addAmplitudeEffect(new FadeOutFX());
+
+		audivi.sequence(1, generateSineWave(audivi, audivi.createBuffer(), 300, 0.5, new Transform()));
+		audivi.sequence(1.6, generateSineWave(audivi, audivi.createBuffer(), 750, 1, transform));
 	}
 );
 
