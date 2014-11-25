@@ -1,37 +1,45 @@
 <script>
 
-function generateSquareWave(buffer, frequency, time, samplesPerSecond) {
+function Transform() {
+
+}
+
+Transform.prototype.get = function() {
+	return 1;
+}
+
+function generateSquareWave(buffer, frequency, time, samplesPerSecond, transform) {
 	var samples = time * samplesPerSecond;
 	var wavelength = (samplesPerSecond / frequency);
 
 	for(var i = 0; i < samples; ++i) {
-		buffer[i] = (i % wavelength) > (wavelength / 2) ? 0 : 1;
+		buffer[i] = ((i % wavelength) > (wavelength / 2) ? 0 : 1) * transform.get();
 	}
 }
 
-function generateSineWave(buffer, frequency, time, samplesPerSecond) {
+function generateSineWave(buffer, frequency, time, samplesPerSecond, transform) {
 	var samples = time * samplesPerSecond;
 
 	for(var i = 0; i < samples; ++i) {
-		buffer[i] = Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency));
+		buffer[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency))) * transform.get();
 	}
 }
 
-function generateTriangleWave(buffer, frequency, time, samplesPerSecond) {
-	var samples = time * samplesPerSecond;
-	var wavelength = (samplesPerSecond / frequency);
-
-	for(var i = 0; i < samples; ++i) {
-		buffer[i] = (i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2);
-	}
-}
-
-function generateSawtoothWave(buffer, frequency, time, samplesPerSecond) {
+function generateTriangleWave(buffer, frequency, time, samplesPerSecond, transform) {
 	var samples = time * samplesPerSecond;
 	var wavelength = (samplesPerSecond / frequency);
 
 	for(var i = 0; i < samples; ++i) {
-		buffer[i] = -1 + 2 * ( (i % wavelength) / wavelength);
+		buffer[i] = ((i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2)) * transform.get();
+	}
+}
+
+function generateSawtoothWave(buffer, frequency, time, samplesPerSecond, transform) {
+	var samples = time * samplesPerSecond;
+	var wavelength = (samplesPerSecond / frequency);
+
+	for(var i = 0; i < samples; ++i) {
+		buffer[i] = (-1 + 2 * ( (i % wavelength) / wavelength)) * transform.get();
 	}
 }
 
@@ -45,6 +53,6 @@ function play(ctx, time, buffer) {
 var ctx = new AudioContext();
 
 var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-generateSawtoothWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate);
+generateSawtoothWave(buffer.getChannelData(0), 440, 5, ctx.sampleRate, new Transform());
 play(ctx, 0, buffer);
 </script>
