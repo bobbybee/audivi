@@ -4,27 +4,36 @@ function ChoppyFX(numberOfSpaces) {
 	this.smoothness = numberOfSpaces;
 }
 
-ChoppyFX.prototype.get = function(audivi, sampleNum) {
+ChoppyFX.prototype.get = function(audivi, transform, sampleNum) {
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 
 	return (sampleNum % (samplesPerSecond / this.smoothness)) > (samplesPerSecond / (this.smoothness * 2)) ? 1 : 0;
 }
 
+function FadeInFX() {
+
+}
+
+FadeInFX.prototype.get = function(audivi, transform, sampleNum) {
+	return sampleNum / (transform.duration * audivi.audioContext.sampleRate);
+}
+
 function Transform() {
 	this.rawAmplitude = 1;
 	this.amplitudeFX = [];
+	this.duration = 0;
 }
 
-Transform.prototype.addEffect = function(fx) {
+Transform.prototype.addAmplitudeEffect = function(fx) {
 	this.amplitudeFX.push(fx);
 	return this.amplitudeFX.length - 1;
 }
 
-Transform.prototype.get = function(audivi, sampleNum) {
+Transform.prototype.getAmplitude = function(audivi, sampleNum) {
 	var amplitude = this.rawAmplitude;
 
 	for(var i = 0; i < this.amplitudeFX.length; ++i) {
-		amplitude *= this.amplitudeFX[i].get(audivi, sampleNum);
+		amplitude *= this.amplitudeFX[i].get(audivi, this, sampleNum);
 	}
 
 	return amplitude;
@@ -38,7 +47,7 @@ function generateSquareWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = ((i % wavelength) > (wavelength / 2) ? 0 : 1) * transform.get(audivi, i);
+		access[i] = ((i % wavelength) > (wavelength / 2) ? 0 : 1) * transform.getAmplitude(audivi, i);
 	}
 
 	return buffer;
@@ -51,7 +60,7 @@ function generateSineWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency))) * transform.get(audivi, i);
+		access[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency))) * transform.getAmplitude(audivi, i);
 	}
 
 	return buffer;
@@ -65,7 +74,7 @@ function generateTriangleWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = ((i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2)) * transform.get(audivi, i);
+		access[i] = ((i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2)) * transform.getAmplitude(audivi, i);
 	}
 	
 	return buffer;
@@ -79,7 +88,7 @@ function generateSawtoothWave(audivi, buffer, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = (-1 + 2 * ( (i % wavelength) / wavelength)) * transform.get(audivi, i);
+		access[i] = (-1 + 2 * ( (i % wavelength) / wavelength)) * transform.getAmplitude(audivi, i);
 	}
 
 	return buffer;
@@ -131,8 +140,10 @@ audite.prototype.audioContext = audioContext;
 audite(
 	function(audivi) {
 		var transform = new Transform();
-		transform.addEffect(new ChoppyFX(1));
-		transform.addEffect(new ChoppyFX(6));
+		transform.duration = 1;
+		//transform.addAmplitudeEffect(new ChoppyFX(1));
+		//transform.addAmplitudeEffect(new ChoppyFX(6));
+		transform.addAmplitudeEffect(new FadeInFX());
 		audivi.sequence(0, generateSineWave(audivi, audivi.createBuffer(), 750, 1, transform)); 
 	}
 );
