@@ -9,10 +9,18 @@ function generateSquareWave(buffer, frequency, time, samplesPerSecond) {
 	}
 }
 
+function generateSineWave(buffer, frequency, time, samplesPerSecond) {
+	var samples = time * samplesPerSecond;
+
+	for(var i = 0; i < samples; ++i) {
+		buffer[i] = Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency));
+	}
+}
+
 var ctx = new AudioContext();
 
 var buffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-generateSquareWave(buffer.getChannelData(0), 440, 3, ctx.sampleRate);
+generateSineWave(buffer.getChannelData(0), 440, 3, ctx.sampleRate);
 
 var source = ctx.createBufferSource();
 source.buffer = buffer;
