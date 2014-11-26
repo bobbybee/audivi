@@ -30,12 +30,18 @@ function Transform(duration, frequency) {
 	this.rawAmplitude = 1;
 	this.rawFrequency = frequency ? frequency : 1;
 	this.amplitudeFX = [];
+	this.frequencyFX = [];
 	this.duration = duration ? duration : 0;
 }
 
 Transform.prototype.addAmplitudeEffect = function(fx) {
 	this.amplitudeFX.push(fx);
 	return this.amplitudeFX.length - 1;
+}
+
+Transform.prototype.addFrequencyEffect = function(fx) {
+	this.frequencyFX.push(fx);
+	return this.frequencyFX.length - 1;
 }
 
 Transform.prototype.getAmplitude = function(audivi, sampleNum) {
