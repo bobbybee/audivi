@@ -55,7 +55,13 @@ Transform.prototype.getAmplitude = function(audivi, sampleNum) {
 }
 
 Transform.prototype.getFrequency = function(audivi, sampleNum) {
-	return this.rawFrequency;
+	var frequency = this.rawFrequency;
+
+	for(var i = 0; i < this.frequencyFX.length; ++i) {
+		frequency *= this.frequencyFX[i].get(audivi, this, sampleNum);
+	}
+
+	return frequency;
 }
 
 function generateSquareWave(audivi, transform) {
