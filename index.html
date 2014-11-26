@@ -1,6 +1,6 @@
 <script>
 
-function ChoppyFX(numberOfSpaces) {
+function ChoppyFX(audivi, transform, numberOfSpaces) {
 	this.smoothness = numberOfSpaces;
 }
 
@@ -10,7 +10,7 @@ ChoppyFX.prototype.get = function(audivi, transform, sampleNum) {
 	return (sampleNum % (samplesPerSecond / this.smoothness)) > (samplesPerSecond / (this.smoothness * 2)) ? 1 : 0;
 }
 
-function FadeInFX() {
+function FadeInFX(audivi, transform) {
 
 }
 
@@ -18,7 +18,7 @@ FadeInFX.prototype.get = function(audivi, transform, sampleNum) {
 	return sampleNum / (transform.duration * audivi.audioContext.sampleRate);
 }
 
-function FadeOutFX() {
+function FadeOutFX(audivi, transform) {
 
 }
 
@@ -40,6 +40,19 @@ function SirenFX(audivi, high, low, highLength, lowLength) {
 
 SirenFX.prototype.get = function(audivi, transform, sampleNum) {
 	return (sampleNum % this.totalLength) > this.highLength ? this.low : this.high;
+}
+
+function SlideFX(audivi, transform, initialFreq, finalFreq) {
+	this.initialFreq = initialFreq;
+	this.finalFreq = finalFreq;
+
+	this.distance = this.finalFreq - this.initialFreq;
+	this.slope = this.distance / audivi.samplesPerTime(transform.duration);
+	this.currentFreq = this.initialFreq;
+}
+
+SlideFX.prototype.get = function(audivi, transform, sampleNum) {
+	return (this.currentFreq += this.slope);
 }
 
 function Transform(duration, frequency) {
@@ -184,9 +197,9 @@ audite.prototype.audioContext = audioContext;
 </script>
 
 <script>
-// neat little sound effect to demonstrate some of the features of Audite
+// a few Audivi samples
 
-audite(
+/* audite(
 	function(audivi) {
 		var transform = new Transform(1, 750);
 
@@ -204,6 +217,15 @@ audite(
 		transform.addAmplitudeEffect(new FadeOutFX());
 
 		audivi.sequence(2, generateSineWave(audivi, transform));
+	}
+); */
+
+audite(
+	function(audivi) {
+		var transform = new Transform(5);
+		transform.addFrequencyEffect(new SlideFX(audivi, transform, 900, 100));
+		transform.addAmplitudeEffect(new FadeOutFX(audivi, transform));
+		audivi.sequence(0, generateSineWave(audivi, transform));
 	}
 );
 
