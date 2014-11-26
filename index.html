@@ -26,7 +26,7 @@ FadeOutFX.prototype.get = function(audivi, transform, sampleNum) {
 	return 1 - (sampleNum / (transform.duration * audivi.audioContext.sampleRate));
 }
 
-function SirenFX(audivi, high, low, highLength, lowLength) {
+function SirenFX(audivi, transform, high, low, highLength, lowLength) {
 	this.high = high;
 	this.low = low;
 	this.highLength = highLength;
@@ -224,6 +224,8 @@ audite(
 	function(audivi) {
 		var transform = new Transform(5);
 		transform.addFrequencyEffect(new SlideFX(audivi, transform, 900, 100));
+		transform.addFrequencyEffect(new SirenFX(audivi, transform, 2, 0.5, 0.05, 0.05));
+		transform.addAmplitudeEffect(new ChoppyFX(audivi, transform, 15));
 		transform.addAmplitudeEffect(new FadeOutFX(audivi, transform));
 		audivi.sequence(0, generateSineWave(audivi, transform));
 	}
