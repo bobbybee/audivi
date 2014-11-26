@@ -26,11 +26,14 @@ FadeOutFX.prototype.get = function(audivi, transform, sampleNum) {
 	return 1 - (sampleNum / (transform.duration * audivi.audioContext.sampleRate));
 }
 
-function SirenFX(high, low, highLength, lowLength) {
+function SirenFX(audivi, high, low, highLength, lowLength) {
 	this.high = high;
 	this.low = low;
 	this.highLength = highLength;
 	this.lowLength = lowLength ? lowLength : highLength;
+
+	this.highLength = audivi.samplesPerTime(this.highLength);
+	this.lowLength = audivi.samplesPerTime(this.lowLength);
 
 	this.totalLength = this.highLength + this.lowLength;
 }
@@ -165,6 +168,10 @@ Audivi.prototype.play = function(time, buffer) {
 	source.start(time);
 }
 
+Audivi.prototype.samplesPerTime = function(time) {
+	return time * this.audioContext.sampleRate;
+}
+
 function audite(sound) { // plural imperative of audio, audire, literally Latin for "Hear Ye"
 	var instance = new Audivi(this.audioContext);
 	sound(instance);
@@ -189,7 +196,7 @@ audite(
 		audivi.sequence(0, generateSineWave(audivi, transform)); 
 
 		var midTransform = new Transform(1);
-		midTransform.addFrequencyEffect(new SirenFX(500, 200, 5512));
+		midTransform.addFrequencyEffect(new SirenFX(audivi, 500, 200, 0.1));
 		audivi.sequence(1, generateSineWave(audivi, midTransform));
 
 		transform.amplitudeFX = [];
