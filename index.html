@@ -26,8 +26,9 @@ FadeOutFX.prototype.get = function(audivi, transform, sampleNum) {
 	return 1 - (sampleNum / (transform.duration * audivi.audioContext.sampleRate));
 }
 
-function Transform() {
+function Transform(frequency) {
 	this.rawAmplitude = 1;
+	this.rawFrequency = frequency ? frequency : 1;
 	this.amplitudeFX = [];
 	this.duration = 0;
 }
@@ -45,6 +46,10 @@ Transform.prototype.getAmplitude = function(audivi, sampleNum) {
 	}
 
 	return amplitude;
+}
+
+Transform.prototype.getFrequency = function(audivi, sampleNum) {
+	return this.rawFrequency;
 }
 
 function generateSquareWave(audivi, time, transform) {
@@ -151,20 +156,20 @@ audite.prototype.audioContext = audioContext;
 
 audite(
 	function(audivi) {
-		var transform = new Transform();
+		var transform = new Transform(750);
 
 		transform.duration = 1;
 		transform.addAmplitudeEffect(new ChoppyFX(3));
 		transform.addAmplitudeEffect(new FadeInFX());
 
-		audivi.sequence(0, generateSineWave(audivi, 750, 1, transform)); 
+		audivi.sequence(0, generateSineWave(audivi, 1, transform)); 
 
 		transform.amplitudeFX = [];
 		transform.addAmplitudeEffect(new ChoppyFX(10));
 		transform.addAmplitudeEffect(new FadeOutFX());
 
-		audivi.sequence(1, generateSineWave(audivi, 300, 0.7, new Transform()));
-		audivi.sequence(1.8, generateSineWave(audivi, 750, 1, transform));
+		audivi.sequence(1, generateSineWave(audivi, 0.7, new Transform(300)));
+		audivi.sequence(1.8, generateSineWave(audivi, 1, transform));
 	}
 );
 
