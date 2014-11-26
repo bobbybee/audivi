@@ -47,7 +47,8 @@ Transform.prototype.getAmplitude = function(audivi, sampleNum) {
 	return amplitude;
 }
 
-function generateSquareWave(audivi, buffer, frequency, time, transform) {
+function generateSquareWave(audivi, frequency, time, transform) {
+	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
 	var wavelength = (samplesPerSecond / frequency);
@@ -61,7 +62,8 @@ function generateSquareWave(audivi, buffer, frequency, time, transform) {
 	return buffer;
 }
 
-function generateSineWave(audivi, buffer, frequency, time, transform) {
+function generateSineWave(audivi, frequency, time, transform) {
+	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
 
@@ -74,7 +76,8 @@ function generateSineWave(audivi, buffer, frequency, time, transform) {
 	return buffer;
 }
 
-function generateTriangleWave(audivi, buffer, frequency, time, transform) {
+function generateTriangleWave(audivi, frequency, time, transform) {
+	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
 	var wavelength = (samplesPerSecond / frequency);
@@ -88,7 +91,8 @@ function generateTriangleWave(audivi, buffer, frequency, time, transform) {
 	return buffer;
 }
 
-function generateSawtoothWave(audivi, buffer, frequency, time, transform) {
+function generateSawtoothWave(audivi, frequency, time, transform) {
+	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
 	var wavelength = (samplesPerSecond / frequency);
@@ -153,14 +157,14 @@ audite(
 		transform.addAmplitudeEffect(new ChoppyFX(3));
 		transform.addAmplitudeEffect(new FadeInFX());
 
-		audivi.sequence(0, generateSineWave(audivi, audivi.createBuffer(), 750, 1, transform)); 
+		audivi.sequence(0, generateSineWave(audivi, 750, 1, transform)); 
 
 		transform.amplitudeFX = [];
 		transform.addAmplitudeEffect(new ChoppyFX(10));
 		transform.addAmplitudeEffect(new FadeOutFX());
 
-		audivi.sequence(1, generateSineWave(audivi, audivi.createBuffer(), 300, 0.7, new Transform()));
-		audivi.sequence(1.8, generateSineWave(audivi, audivi.createBuffer(), 750, 1, transform));
+		audivi.sequence(1, generateSineWave(audivi, 300, 0.7, new Transform()));
+		audivi.sequence(1.8, generateSineWave(audivi, 750, 1, transform));
 	}
 );
 
