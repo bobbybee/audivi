@@ -26,6 +26,19 @@ FadeOutFX.prototype.get = function(audivi, transform, sampleNum) {
 	return 1 - (sampleNum / (transform.duration * audivi.audioContext.sampleRate));
 }
 
+function SirenFX(high, low, highLength, lowLength) {
+	this.high = high;
+	this.low = low;
+	this.highLength = highLength;
+	this.lowLength = lowLength ? lowLength : highLength;
+
+	this.totalLength = this.highLength + this.lowLength;
+}
+
+SirenFX.prototype.get = function(audivi, transform, sampleNum) {
+	return (sampleNum % this.totalLength) > this.highLength ? this.low : this.high;
+}
+
 function Transform(duration, frequency) {
 	this.rawAmplitude = 1;
 	this.rawFrequency = frequency ? frequency : 1;
@@ -175,12 +188,15 @@ audite(
 
 		audivi.sequence(0, generateSineWave(audivi, transform)); 
 
+		var midTransform = new Transform(1);
+		midTransform.addFrequencyEffect(new SirenFX(500, 200, 5512));
+		audivi.sequence(1, generateSineWave(audivi, midTransform));
+
 		transform.amplitudeFX = [];
 		transform.addAmplitudeEffect(new ChoppyFX(10));
 		transform.addAmplitudeEffect(new FadeOutFX());
 
-		audivi.sequence(1, generateSineWave(audivi, new Transform(0.7, 300)));
-		audivi.sequence(1.8, generateSineWave(audivi, transform));
+		audivi.sequence(2, generateSineWave(audivi, transform));
 	}
 );
 
