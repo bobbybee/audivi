@@ -47,22 +47,22 @@ Transform.prototype.getAmplitude = function(audivi, sampleNum) {
 	return amplitude;
 }
 
-function generateSquareWave(audivi, frequency, time, transform) {
+function generateSquareWave(audivi, time, transform) {
 	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
-	var wavelength = (samplesPerSecond / frequency);
 
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
+		var wavelength = (samplesPerSecond / transform.getFrequency(audivi, i));
 		access[i] = ((i % wavelength) > (wavelength / 2) ? 0 : 1) * transform.getAmplitude(audivi, i);
 	}
 
 	return buffer;
 }
 
-function generateSineWave(audivi, frequency, time, transform) {
+function generateSineWave(audivi, time, transform) {
 	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
@@ -70,36 +70,36 @@ function generateSineWave(audivi, frequency, time, transform) {
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
-		access[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / frequency))) * transform.getAmplitude(audivi, i);
+		access[i] = (Math.sin(i / (samplesPerSecond / 2 / Math.PI / transform.getFrequency(audivi, i)))) * transform.getAmplitude(audivi, i);
 	}
 
 	return buffer;
 }
 
-function generateTriangleWave(audivi, frequency, time, transform) {
+function generateTriangleWave(audivi, time, transform) {
 	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
-	var wavelength = (samplesPerSecond / frequency);
 
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
+		var wavelength = (samplesPerSecond / transform.getFrequency(audivi, i));
 		access[i] = ((i % wavelength) > (wavelength / 2) ? 1 - ((i % wavelength) - (wavelength / 2)) / (wavelength / 2) : (i % wavelength) / (wavelength / 2)) * transform.getAmplitude(audivi, i);
 	}
 	
 	return buffer;
 }
 
-function generateSawtoothWave(audivi, frequency, time, transform) {
+function generateSawtoothWave(audivi, time, transform) {
 	var buffer = audivi.createBuffer();
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = time * samplesPerSecond;
-	var wavelength = (samplesPerSecond / frequency);
 
 	var access = buffer.getChannelData(0);
 
 	for(var i = 0; i < samples; ++i) {
+		var wavelength = (samplesPerSecond / transform.getFrequency(audivi, i));
 		access[i] = (-1 + 2 * ( (i % wavelength) / wavelength)) * transform.getAmplitude(audivi, i);
 	}
 
