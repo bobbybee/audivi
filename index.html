@@ -15,7 +15,7 @@ function FadeInFX(audivi, transform) {
 }
 
 FadeInFX.prototype.get = function(audivi, transform, sampleNum) {
-	return sampleNum / (transform.duration * audivi.audioContext.sampleRate);
+	return sampleNum / audivi.samplesPerTime(transform.duration);
 }
 
 function FadeOutFX(audivi, transform) {
@@ -23,7 +23,7 @@ function FadeOutFX(audivi, transform) {
 }
 
 FadeOutFX.prototype.get = function(audivi, transform, sampleNum) {
-	return 1 - (sampleNum / (transform.duration * audivi.audioContext.sampleRate));
+	return 1 - (sampleNum / audivi.samplesPerTime(transform.duration));
 }
 
 function SirenFX(audivi, transform, high, low, highLength, lowLength) {
@@ -47,12 +47,10 @@ function SlideFX(audivi, transform, initialFreq, finalFreq) {
 	this.finalFreq = finalFreq;
 
 	this.distance = this.finalFreq - this.initialFreq;
-	this.slope = this.distance / audivi.samplesPerTime(transform.duration);
-	this.currentFreq = this.initialFreq;
 }
 
 SlideFX.prototype.get = function(audivi, transform, sampleNum) {
-	return (this.currentFreq += this.slope);
+	return this.initialFreq + (sampleNum * this.distance / audivi.samplesPerTime(transform.duration));
 }
 
 function Transform(duration, frequency) {
@@ -94,7 +92,7 @@ Transform.prototype.getFrequency = function(audivi, sampleNum) {
 }
 
 function generateSquareWave(audivi, transform) {
-	var buffer = audivi.createBuffer();
+	var buffer = audivi.createBuffer(transform.duration);
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = transform.duration * samplesPerSecond;
 
@@ -109,9 +107,9 @@ function generateSquareWave(audivi, transform) {
 }
 
 function generateSineWave(audivi, transform) {
-	var buffer = audivi.createBuffer();
+	var buffer = audivi.createBuffer(transform.duration);
 	var samplesPerSecond = audivi.audioContext.sampleRate;
-	var samples = transform.duration * samplesPerSecond;
+	var samples = audivi.samplesPerTime(transform.duration);
 
 	var access = buffer.getChannelData(0);
 
@@ -123,7 +121,7 @@ function generateSineWave(audivi, transform) {
 }
 
 function generateTriangleWave(audivi, transform) {
-	var buffer = audivi.createBuffer();
+	var buffer = audivi.createBuffer(transform.duration);
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = transform.duration * samplesPerSecond;
 
@@ -138,7 +136,7 @@ function generateTriangleWave(audivi, transform) {
 }
 
 function generateSawtoothWave(audivi, transform) {
-	var buffer = audivi.createBuffer();
+	var buffer = audivi.createBuffer(transform.duration);
 	var samplesPerSecond = audivi.audioContext.sampleRate;
 	var samples = transform.duration * samplesPerSecond;
 
@@ -157,8 +155,8 @@ function Audivi(audioContext) {
 	this.sequences = [];
 }
 
-Audivi.prototype.createBuffer = function() {
-	return this.audioContext.createBuffer(1, this.audioContext.sampleRate, this.audioContext.sampleRate);
+Audivi.prototype.createBuffer = function(duration) {
+	return this.audioContext.createBuffer(1, this.audioContext.sampleRate * duration, this.audioContext.sampleRate);
 }
 
 Audivi.prototype.sequence = function(time, buffer) {
@@ -222,12 +220,12 @@ audite.prototype.audioContext = audioContext;
 
 audite(
 	function(audivi) {
-		var transform = new Transform(5);
-		transform.addFrequencyEffect(new SlideFX(audivi, transform, 900, 100));
+		var transform = new Transform(3);
+		transform.addFrequencyEffect(new SlideFX(audivi, transform, 500, 100));
 		transform.addFrequencyEffect(new SirenFX(audivi, transform, 2, 0.5, 0.05, 0.05));
 		transform.addAmplitudeEffect(new ChoppyFX(audivi, transform, 15));
 		transform.addAmplitudeEffect(new FadeOutFX(audivi, transform));
-		audivi.sequence(0, generateSineWave(audivi, transform));
+		audivi.sequence(0, generateSquareWave(audivi, transform));
 	}
 );
 
